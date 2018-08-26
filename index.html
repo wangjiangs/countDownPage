@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>倒计时</title>
+        <style>
+            *{
+                margin: 0;padding: 0;
+                -webkit-font-smoothing:antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+            html,body{
+                height: 100%;
+            }
+            body{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background:linear-gradient(#4D0551,#22083C)
+            }
+            .pane{
+                width: 21.44rem;
+                height: 7.88rem;
+                background-color: #353060;
+                border-radius: .63rem;
+            }
+            .pane > p{
+                color: white;
+                text-align: center;
+                margin-top: 1rem;
+            }
+            .pane > p:nth-child(1){
+                font-size: 1.13rem;
+            }
+            .pane > p:nth-child(2){
+                font-size: 2rem;
+                text-shadow: 0 0 0.38rem #4a90e2;
+                font-weight: bold;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 1rem 2rem;
+            }
+            .pane > p:nth-child(2) > span:last-child{
+                width: 8.31rem;
+                display: flex;
+                justify-content: space-around;
+            }
+            .pane > p:nth-child(2) > span:nth-child(2){
+                width: 0.06rem;
+                height: 2.81rem;
+                background: linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,1),rgba(255,255,255,0));
+            }
+            .pane > p:nth-child(2) > span:last-child > span{
+                width: 2.75rem;
+                text-align: left;
+            }
+            #datetime.onlyTime{
+                justify-content: center;
+            }
+            .onlyTime > span:nth-child(1){
+                display: none
+            }
+            .onlyTime > span:nth-child(2){
+                display: none
+            }
+
+
+        </style>
+    <script>
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?2c5120cb8a49834073b8cc289c4bea0c";
+          var s = document.getElementsByTagName("script")[0]; 
+          s.parentNode.insertBefore(hm, s);
+        })();
+        </script>
+    </head>
+    <body>
+        <div class="pane">
+            <p>开放倒计时</p>
+            <p id="datetime">
+                <span><span id="day">0</span> Day</span>
+                <span></span>
+                <span>
+                    <span id="hour">00</span>:<span id="min">00</span>:<span id="sec">00</span>
+                </span>
+            </p>
+        </div>
+    </body>
+    <script>
+        var endTime = new Date(2019, 7, 26, 23, 51)     //配置终止时间
+        var callback = function(){
+            //时间终止后的回调
+            alert(1)
+        }
+        function autoBaseFont(){
+                var standardWidth = 375
+                var stardardFont = 16
+                var minWidth = 0
+                var maxWidth = 1000
+                var currentWidth = document.body.offsetWidth
+                var baseFont = stardardFont
+                currentWidth = currentWidth < minWidth?minWidth:currentWidth
+                currentWidth = currentWidth > maxWidth?maxWidth:currentWidth
+                baseFont = stardardFont / standardWidth * currentWidth
+                document.getElementsByTagName('html')[0].style.fontSize = baseFont + 'px'
+        }
+        autoBaseFont()
+        window.onresize = function(){
+            //窗口大小改变时调节字体大小
+            autoBaseFont()
+        }
+        //
+        function addPrefix(num){
+            return num<10?'0'+num:num
+        }
+        //渲染时间到页面
+        function render(dt){
+
+            if(dt.getDate() === 1){
+                document.getElementById("datetime").classList.add('onlyTime')
+            }else{
+                document.getElementById('day').textContent = addPrefix(dt.getDate() - 1)
+            }
+            document.getElementById('hour').textContent = addPrefix(dt.getHours())
+            document.getElementById('min').textContent = addPrefix(dt.getMinutes())
+            document.getElementById('sec').textContent = addPrefix(dt.getSeconds())  
+            if(!dt.getHours()&&dt.getDate()===1&&!dt.getMinutes()&&!dt.getHours()&&!dt.getSeconds()){
+                //倒计时终止
+                clearInterval(window.interv)
+                callback()
+                return;
+            }
+        }
+        !function(){
+            //上线日期 2018-08-24日 00:00:00
+            var upTime = endTime.getTime()
+            var stime = upTime % 1000
+            upTime = (upTime - Date.now())/1000
+            //剩余天数
+            var day = upTime / (24 * 60 * 60)
+            upTime = upTime % (24 * 60 * 60)
+            //剩余小时
+            var hour = upTime/(60 * 60)
+            upTime = upTime % (60 * 60)
+            //剩余分钟
+            var min = upTime / 60
+            //剩余秒数
+            var sec = upTime % 60
+
+            var dt = new Date(2018, 0, day+1, hour, min, sec)
+            
+            //立即渲染时间
+            render(dt)
+            //定时刷新页面时间
+            setTimeout(function(){
+                dt = new Date(dt.getTime() - 1000)
+                render(dt)
+                window.interv = setInterval(function(){
+                    dt = new Date(dt.getTime() - 1000)
+                    render(dt)
+                    
+                }, 1000)
+            }, stime)            
+        }()
+    </script>
+
+</html>
